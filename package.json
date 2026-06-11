@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "kb:index": "node scripts/build-index.mjs",
+    "kb:check": "node scripts/build-index.mjs --check"
+  }
+}
