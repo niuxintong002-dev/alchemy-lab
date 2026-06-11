@@ -10,6 +10,7 @@ const MVP_TYPES = new Set(["source-note", "insight"]);
 const args = process.argv.slice(2);
 const checkOnly = args.includes("--check");
 const root = path.resolve(readOption("--root") ?? process.cwd());
+const kbRoot = path.resolve(readOption("--kb-root") ?? root);
 
 main().catch((error) => {
   console.error(error instanceof Error ? error.message : String(error));
@@ -28,10 +29,10 @@ async function main() {
   const ruleCodes = parseRuleCodes(conventionsText);
   const contracts = parseFieldContracts(conventionsText);
   const validTopics = parseTopicRegistry(topicsText);
-  const artifactFiles = await listArtifactFiles(root);
-  const indexWasStale = await isIndexStale(root, artifactFiles);
+  const artifactFiles = await listArtifactFiles(kbRoot);
+  const indexWasStale = await isIndexStale(kbRoot, artifactFiles);
 
-  const artifacts = await scanArtifacts(root, artifactFiles);
+  const artifacts = await scanArtifacts(kbRoot, artifactFiles);
   const edges = buildEdges(artifacts);
   const diagnostics = buildDiagnostics({
     artifacts,
@@ -52,9 +53,9 @@ async function main() {
   }
 
   if (!checkOnly) {
-    await fs.mkdir(path.join(root, GENERATED_DIR), { recursive: true });
-    await writeJsonl(path.join(root, GENERATED_DIR, ARTIFACTS_FILE), artifacts.map(toArtifactRecord));
-    await writeJsonl(path.join(root, GENERATED_DIR, DIAGNOSTICS_FILE), diagnostics);
+    await fs.mkdir(path.join(kbRoot, GENERATED_DIR), { recursive: true });
+    await writeJsonl(path.join(kbRoot, GENERATED_DIR, ARTIFACTS_FILE), artifacts.map(toArtifactRecord));
+    await writeJsonl(path.join(kbRoot, GENERATED_DIR, DIAGNOSTICS_FILE), diagnostics);
   }
 
   const errorCount = diagnostics.filter((item) => item.severity === "error").length;

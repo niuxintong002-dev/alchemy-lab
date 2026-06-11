@@ -1,2 +1,3 @@
 .verify/runs/
 generated/*.jsonl
+evals/fixtures/*/generated/*.jsonl
